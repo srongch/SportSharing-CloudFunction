@@ -41,7 +41,7 @@ exports.addNumbers = functions.https.onCall((data) => {
     });
     // [END allAdd]
 
-    // getClassById({"classId" : "-LaeCAA9TezbYYlCGAEl"})
+    // getClassById({"classId" : "-LbNIaTzEoLt0glVEXeC","authorId" : "e25sVR1axFd4L2hBh9CcS5MtzQl2"})
 // [START messageFunctionTrigger]
 // Saves a message to the Firebase Realtime Database but sanitizes the text by removing swearwords.
 exports.getClassById = functions.https.onCall((data, context) => {
@@ -50,10 +50,12 @@ exports.getClassById = functions.https.onCall((data, context) => {
     // Message text passed from the client.
     console.log("dfgfd" + JSON.stringify(data))
     const text = data.classId;
+    const authorId = data.authorId;
     // [END readMessageData]
     // [START messageHttpsErrors]
     // Checking attribute.
-    if (!(typeof text === 'string') || text.length === 0) {
+    if (!(typeof text === 'string') || text.length === 0 || 
+        !(typeof authorId === 'string') || text.length === 0 ) {
       // Throwing an HttpsError so that the client gets the error details.
       throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
           'one arguments "text" containing the message text to add.');
@@ -66,15 +68,24 @@ exports.getClassById = functions.https.onCall((data, context) => {
 
     var classes =  admin.database().ref(`classes`).child(text).once('value')
     var reviews =  admin.database().ref(`reviews`).child(text).limitToFirst(2).once('value')
-        return newPromise = Promise.all([classes,reviews])
+    var author =  admin.database().ref(`users`).child(authorId).once('value')
+        return newPromise = Promise.all([classes,reviews,author])
             .then((snapshotContainsArrayOfSnapshots) => {
                 // let classes= []
                 snapshotContainsArrayOfSnapshots[0].val()
-                console.log(snapshotContainsArrayOfSnapshots[0].val())
-                // snapshotContainsArrayOfSnapshots.forEach((snapshot) => {
-                //     data.push(snapshot.val())
-                // })
-                return {"classes" :snapshotContainsArrayOfSnapshots[0].val() ,
+                console.log(snapshotContainsArrayOfSnapshots[2].val())
+
+                var classes = snapshotContainsArrayOfSnapshots[0].val()
+                var author = snapshotContainsArrayOfSnapshots[2].val()
+                // classes.name=  author.name
+                // classes.description =  author.description
+                console.log(author.name)
+                classes.authorName=  author.name
+                if (!author.description) { classes.description =  ""}
+                else  classes.description = author.description
+                 
+
+                return {"classes" :classes ,
                         "reviews" :snapshotContainsArrayOfSnapshots[1].val() }
             })
 
@@ -159,7 +170,7 @@ function addReviews(postId){
                 uid : user['uid'],
                 postId : postId,
                 text : review,
-                timeStamp : Math.floor(new Date() / 1000)
+                timeStamp : Math.floor(Date.now())
 
             }
 
