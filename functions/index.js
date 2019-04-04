@@ -41,7 +41,7 @@ exports.addNumbers = functions.https.onCall((data) => {
     });
     // [END allAdd]
 
-    // getClassById({"classId" : "-LbNIaTzEoLt0glVEXeC","authorId" : "e25sVR1axFd4L2hBh9CcS5MtzQl2"})
+    // getClassById({"classId" : "-LbTDLPrTvhjdYJqVpmR","authorId" : "e25sVR1axFd4L2hBh9CcS5MtzQl2"})
 // [START messageFunctionTrigger]
 // Saves a message to the Firebase Realtime Database but sanitizes the text by removing swearwords.
 exports.getClassById = functions.https.onCall((data, context) => {
@@ -55,7 +55,7 @@ exports.getClassById = functions.https.onCall((data, context) => {
     // [START messageHttpsErrors]
     // Checking attribute.
     if (!(typeof text === 'string') || text.length === 0 || 
-        !(typeof authorId === 'string') || text.length === 0 ) {
+        !(typeof authorId === 'string') || authorId.length === 0 ) {
       // Throwing an HttpsError so that the client gets the error details.
       throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
           'one arguments "text" containing the message text to add.');
@@ -115,6 +115,50 @@ exports.getClassById = functions.https.onCall((data, context) => {
     // [END_EXCLUDE]
   });
   // [END messageFunctionTrigger]
+
+
+//   userBooking({"classId" : "-LbTDLPrTvhjdYJqVpmR","userId" : "98tKelkTBGcaQOG5157Q2Lv5mgm2"})
+exports.userBooking = functions.https.onCall((data, context) => {
+    // [START_EXCLUDE]
+    console.log("dfgfd" + JSON.stringify(data))
+    const classId = data.classId;
+    const userid = data.userId;
+
+    if (!(typeof classId === 'string') || classId.length === 0 || 
+        !(typeof userid === 'string') || userid.length === 0 ) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
+          'one arguments "text" containing the message text to add.');
+    }
+
+    // eslint-disable-next-line promise/always-return
+    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
+        
+    // })
+
+    var user =  admin.database().ref(`users`).child(userid).once('value')
+        return newPromise = Promise.all([user])
+            .then((snapshotContainsArrayOfSnapshots) => {
+                // let classes= [
+                    var user = snapshotContainsArrayOfSnapshots[0].val()
+                    data.name = user.name
+                    data.profile = user.profile
+                    console.log(data)
+
+                       // eslint-disable-next-line promise/no-nesting
+                       return Promise.all( [admin.database().ref(`booking`).child().set(data)])
+
+            //   Promise.all( admin.database().ref(`booking`).child().set(data).then((snapshot)=>{
+            //             console.log(snapshot.val())
+            //             return
+            //         })
+            //  return
+            })
+
+  });
+  // [END messageFunctionTrigger]
+
+
 
 
 // listener for when user add new post
