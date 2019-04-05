@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-
+const generateUniqueId = require('node-unique-id')
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
@@ -143,23 +143,82 @@ exports.userBooking = functions.https.onCall((data, context) => {
                     var user = snapshotContainsArrayOfSnapshots[0].val()
                     data.name = user.name
                     data.profile = user.profile
+                    data.orderId = generateUniqueId() 
                     console.log(data)
 
+                    var myRef = admin.database().ref().push();
+                    var key = myRef.key;
                        // eslint-disable-next-line promise/no-nesting
-                       return Promise.all( [admin.database().ref(`booking`).child().set(data)])
-
-            //   Promise.all( admin.database().ref(`booking`).child().set(data).then((snapshot)=>{
-            //             console.log(snapshot.val())
-            //             return
-            //         })
-            //  return
+                       return Promise.all( [admin.database().ref(`booking`).child(key).set(data)]).then(
+                           // eslint-disable-next-line promise/always-return
+                           () => {
+                               return {
+                                   "code" : "0000"
+                               }
+                           }
+                       ).catch(() => {
+                         throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+                      });
             })
 
   });
   // [END messageFunctionTrigger]
 
+//   98tKelkTBGcaQOG5157Q2Lv5mgm2
+// userBookingList({"userId" : "98tKelkTBGcaQOG5157Q2Lv5mgm2"})
+  exports.userBookingList = functions.https.onCall((data, context) => {
+    // [START_EXCLUDE]
+    console.log("dfgfd" + JSON.stringify(data))
+    const userid = data.userId;
 
+    if (!(typeof userid === 'string') || userid.length === 0 ) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
+          'one arguments "text" containing the message text to add.');
+    }
 
+    return Promise.all( [admin.database().ref(`booking`).orderByChild('userId').equalTo(userid).once('value')]).then((snapshot)=>{
+
+       // console.log(snapshot[0].val())
+        var list =  snapshot[0].val()
+        console.log("data size " +Object.keys(list).length)
+
+        return {"data" :list}
+    }).catch(() => {
+        throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+     });
+
+    // eslint-disable-next-line promise/always-return
+    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
+        
+    // })
+
+    // var user =  admin.database().ref(`users`).child(userid).once('value')
+    //     return newPromise = Promise.all([user])
+    //         .then((snapshotContainsArrayOfSnapshots) => {
+    //             // let classes= [
+    //                 var user = snapshotContainsArrayOfSnapshots[0].val()
+    //                 data.name = user.name
+    //                 data.profile = user.profile
+    //                 console.log(data)
+
+    //                 var myRef = admin.database().ref().push();
+    //                 var key = myRef.key;
+    //                    // eslint-disable-next-line promise/no-nesting
+    //                    return Promise.all( [admin.database().ref(`booking`).child(key).set(data)]).then(
+    //                        // eslint-disable-next-line promise/always-return
+    //                        () => {
+    //                            return {
+    //                                "code" : "0000"
+    //                            }
+    //                        }
+    //                    ).catch(() => {
+    //                      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+    //                   });
+    //         })
+
+  });
+  // [END messageFunctionTrigger]
 
 // listener for when user add new post
 exports.observeClassAdd = functions.database.ref('classes/{pushId}')
