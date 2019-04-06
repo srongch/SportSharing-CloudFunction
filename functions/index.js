@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const generateUniqueId = require('node-unique-id')
+const services = require('./service/services.js');
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
@@ -219,6 +220,68 @@ exports.userBooking = functions.https.onCall((data, context) => {
 
   });
   // [END messageFunctionTrigger]
+
+//   userProfile({"userId" : "98tKelkTBGcaQOG5157Q2Lv5mgm2"})
+  exports.userProfile = functions.https.onCall((data, context) => {
+    // [START_EXCLUDE]
+    console.log("dfgfd" + JSON.stringify(data))
+    const userid = data.userId;
+
+    if (!(typeof userid === 'string') || userid.length === 0 ) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
+          'one arguments "text" containing the message text to add.');
+    }
+
+    // console.log(services.getTimestamp())
+    var userBookingList = admin.database().ref(`booking`).orderByChild('userId').equalTo(userid).once('value')
+    var userLikeList = admin.database().ref(`likes`).child(userid).once('value')
+
+    return Promise.all( [userBookingList, userLikeList]).then((snapshot)=>{
+
+       console.log(Object.keys(snapshot))
+        var list =  snapshot[0].val()
+        var like = snapshot[1].val()
+        console.log("booking size " +Object.keys(snapshot).length)
+       console.log("like size " +snapshot[1].val())
+        return {"booking_count" :Object.keys(list).length,
+                "like_count" : like === null ? 0 : Object.keys(like).length}
+    }).catch(() => {
+        throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+     });
+
+    // eslint-disable-next-line promise/always-return
+    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
+        
+    // })
+
+    // var user =  admin.database().ref(`users`).child(userid).once('value')
+    //     return newPromise = Promise.all([user])
+    //         .then((snapshotContainsArrayOfSnapshots) => {
+    //             // let classes= [
+    //                 var user = snapshotContainsArrayOfSnapshots[0].val()
+    //                 data.name = user.name
+    //                 data.profile = user.profile
+    //                 console.log(data)
+
+    //                 var myRef = admin.database().ref().push();
+    //                 var key = myRef.key;
+    //                    // eslint-disable-next-line promise/no-nesting
+    //                    return Promise.all( [admin.database().ref(`booking`).child(key).set(data)]).then(
+    //                        // eslint-disable-next-line promise/always-return
+    //                        () => {
+    //                            return {
+    //                                "code" : "0000"
+    //                            }
+    //                        }
+    //                    ).catch(() => {
+    //                      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+    //                   });
+    //         })
+
+  });
+  // [END messageFunctionTrigger]
+
 
 // listener for when user add new post
 exports.observeClassAdd = functions.database.ref('classes/{pushId}')
