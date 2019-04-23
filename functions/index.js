@@ -43,7 +43,7 @@ exports.addNumbers = functions.https.onCall((data) => {
     });
     // [END allAdd]
 
-    // getClassById({"classId" : "-LbTDLPrTvhjdYJqVpmR","authorId" : "e25sVR1axFd4L2hBh9CcS5MtzQl2"})
+    // getClassById({"classId" : "-LdABj_8Hmf3LhaEweoe","authorId" : "h1YWXNupzLVkzdN6IQLRLuXyvQI3"})
 // [START messageFunctionTrigger]
 // Saves a message to the Firebase Realtime Database but sanitizes the text by removing swearwords.
 exports.getClassById = functions.https.onCall((data, context) => {
@@ -78,11 +78,17 @@ exports.getClassById = functions.https.onCall((data, context) => {
                 console.log(snapshotContainsArrayOfSnapshots[2].val())
 
                 var classes = snapshotContainsArrayOfSnapshots[0].val()
+
+                if(classes === null){
+                  throw new functions.https.HttpsError('not-found', 'Class not found');
+                }
+
                 var author = snapshotContainsArrayOfSnapshots[2].val()
                 // classes.name=  author.name
-                // classes.description =  author.description
+                classes.authorDesc =  author.memo
                 console.log(author.name)
                 classes.authorName=  author.name
+                classes.authorProfile=  author.profile
                 if (!author.description) { classes.description =  ""}
                 else  classes.description = author.description
                  
@@ -684,6 +690,10 @@ exports.trainerBookingList = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'failed to booking');
      });
 
+  });
+
+  exports.ping = functions.https.onCall((data, context) => {
+      return {"date" : "success"}
   });
   // [END messageFunctionTrigger]
 
