@@ -172,6 +172,7 @@ exports.userBooking = functions.https.onCall((data, context) => {
   });
   // [END messageFunctionTrigger]
 
+
 //   98tKelkTBGcaQOG5157Q2Lv5mgm2
 // userBookingList({"userId" : "98tKelkTBGcaQOG5157Q2Lv5mgm2"})
   exports.userBookingList = functions.https.onCall((data, context) => {
@@ -710,3 +711,28 @@ exports.trainerBookingList = functions.https.onCall((data, context) => {
 //      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
 //   });
 
+// trainerBookingList({"authorId" : "91Uj65Ak0sUaDoT1y8W8r3LbaOC2"})
+// exports.trainerBookingList = functions.https.onCall((data, context) => {
+//   // [START_EXCLUDE]
+//   console.log("dfgfd" + JSON.stringify(data))
+//   const authorId = data.authorId;
+
+//   if (!(typeof authorId === 'string') || authorId.length === 0 ) {
+//     // Throwing an HttpsError so that the client gets the error details.
+//     throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
+//         'one arguments "text" containing the message text to add.');
+//   }
+
+//   return Promise.all( [admin.database().ref(`booking`).orderByChild('authorId').equalTo(authorId).once('value')]).then((snapshot)=>{
+
+//      // console.log(snapshot[0].val())
+//       var list =  snapshot[0].val()
+//       // console.log("data size " +Object.keys(list).length)
+
+//       return {"data" :list}
+//   }).catch(() => {
+//       throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
+//    });
+
+//   });
+  // [END messageFunctionTrigger]
