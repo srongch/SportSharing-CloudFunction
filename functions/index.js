@@ -1,7 +1,6 @@
 /* eslint-disable promise/always-return */
 const functions = require('firebase-functions');
 const generateUniqueId = require('node-unique-id')
-const services = require('./service/services.js');
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
@@ -10,38 +9,6 @@ const services = require('./service/services.js');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-
-// [START allAdd]
-// [START addFunctionTrigger]
-// Adds two numbers to each other.
-exports.addNumbers = functions.https.onCall((data) => {
-    // [END addFunctionTrigger]
-      // [START readAddData]
-      // Numbers passed from the client.
-      const firstNumber = data.firstNumber;
-      const secondNumber = data.secondNumber;
-      // [END readAddData]
-    
-      // [START addHttpsError]
-      // Checking that attributes are present and are numbers.
-      if (!Number.isFinite(firstNumber) || !Number.isFinite(secondNumber)) {
-        // Throwing an HttpsError so that the client gets the error details.
-        throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-            'two arguments "firstNumber" and "secondNumber" which must both be numbers.');
-      }
-      // [END addHttpsError]
-    
-      // [START returnAddData]
-      // returning result.
-      return {
-        firstNumber: firstNumber,
-        secondNumber: secondNumber,
-        operator: '+',
-        operationResult: firstNumber + secondNumber,
-      };
-      // [END returnAddData]
-    });
-    // [END allAdd]
 
     // getClassById({"classId" : "-LdABj_8Hmf3LhaEweoe","authorId" : "h1YWXNupzLVkzdN6IQLRLuXyvQI3"})
 // [START messageFunctionTrigger]
@@ -62,11 +29,6 @@ exports.getClassById = functions.https.onCall((data, context) => {
       throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
           'one arguments "text" containing the message text to add.');
     }
-
-    // eslint-disable-next-line promise/always-return
-    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
-        
-    // })
 
     var classes =  admin.database().ref(`classes`).child(text).once('value')
     var reviews =  admin.database().ref(`reviews`).child(text).limitToFirst(2).once('value')
@@ -97,29 +59,6 @@ exports.getClassById = functions.https.onCall((data, context) => {
                         "reviews" :snapshotContainsArrayOfSnapshots[1].val() }
             })
 
-    // return {text : "dfgfdgdf"}
-//    return  admin.database().ref(`users`).child('0IbLEmYzuxasoqkaHnKWQ064pw43').once('value',(snapshot) => {
-//         return { text: "sanitizedMessage" };
-//     });
-
-    // [START returnMessageAsync]
-    // Saving the new message to the Realtime Database.
-    // const sanitizedMessage = sanitizer.sanitizeText(text); // Sanitize the message.
-
-
-    // return admin.database().ref('/messages').push({
-    //   text: sanitizedMessage,
-    //   author: { uid, name, picture, email },
-    // }).then(() => {
-    //   console.log('New Message written');
-    //   // Returning the sanitized message to the client.
-    //   return { text: sanitizedMessage };
-    // })
-    // // [END returnMessageAsync]
-    // .catch((error) => {
-    //   // Re-throwing the error as an HttpsError so that the client gets the error details.
-    //   throw new functions.https.HttpsError('unknown', error.message, error);
-    // });
     // [END_EXCLUDE]
   });
   // [END messageFunctionTrigger]
@@ -139,10 +78,6 @@ exports.userBooking = functions.https.onCall((data, context) => {
           'one arguments "text" containing the message text to add.');
     }
 
-    // eslint-disable-next-line promise/always-return
-    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
-        
-    // })
 
     var user =  admin.database().ref(`users`).child(userid).once('value')
         return newPromise = Promise.all([user])
@@ -197,35 +132,6 @@ exports.userBooking = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
      });
 
-    // eslint-disable-next-line promise/always-return
-    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
-        
-    // })
-
-    // var user =  admin.database().ref(`users`).child(userid).once('value')
-    //     return newPromise = Promise.all([user])
-    //         .then((snapshotContainsArrayOfSnapshots) => {
-    //             // let classes= [
-    //                 var user = snapshotContainsArrayOfSnapshots[0].val()
-    //                 data.name = user.name
-    //                 data.profile = user.profile
-    //                 console.log(data)
-
-    //                 var myRef = admin.database().ref().push();
-    //                 var key = myRef.key;
-    //                    // eslint-disable-next-line promise/no-nesting
-    //                    return Promise.all( [admin.database().ref(`booking`).child(key).set(data)]).then(
-    //                        // eslint-disable-next-line promise/always-return
-    //                        () => {
-    //                            return {
-    //                                "code" : "0000"
-    //                            }
-    //                        }
-    //                    ).catch(() => {
-    //                      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
-    //                   });
-    //         })
-
   });
   // [END messageFunctionTrigger]
 
@@ -257,35 +163,6 @@ exports.userBooking = functions.https.onCall((data, context) => {
     }).catch(() => {
         throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
      });
-
-    // eslint-disable-next-line promise/always-return
-    // return Promise.all( admin.database().ref(`classes`)).then((snapshot)=>{
-        
-    // })
-
-    // var user =  admin.database().ref(`users`).child(userid).once('value')
-    //     return newPromise = Promise.all([user])
-    //         .then((snapshotContainsArrayOfSnapshots) => {
-    //             // let classes= [
-    //                 var user = snapshotContainsArrayOfSnapshots[0].val()
-    //                 data.name = user.name
-    //                 data.profile = user.profile
-    //                 console.log(data)
-
-    //                 var myRef = admin.database().ref().push();
-    //                 var key = myRef.key;
-    //                    // eslint-disable-next-line promise/no-nesting
-    //                    return Promise.all( [admin.database().ref(`booking`).child(key).set(data)]).then(
-    //                        // eslint-disable-next-line promise/always-return
-    //                        () => {
-    //                            return {
-    //                                "code" : "0000"
-    //                            }
-    //                        }
-    //                    ).catch(() => {
-    //                      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
-    //                   });
-    //         })
 
   });
   // [END messageFunctionTrigger]
@@ -351,11 +228,7 @@ function addReviews(postId){
             var myRef = admin.database().ref().push();
             var key = myRef.key;
 
-            console.log("key is : " + key)
-            // :{"email":"user4@email.com","name":"Jonh Deo","profile":"","uid":"mr1J9V2u7ihIf8w8uw3wJb7envG2","userType":"user"}
-
-            // console.log("user is :" + JSON.stringify(data) )
-            // console.log("reviews is :" + review )
+     
             var task = admin.database().ref(`reviews`).child(postId).child(key).set(data)
             var usertask = admin.database().ref(`user_reviews`).child(user['uid']).child(postId).child(key).set(true)
             addBatch.push(task,usertask)
@@ -414,10 +287,7 @@ exports.profileChange = functions.database.ref('/users/{pushId}')
          //     console.log("sub ",key, list[key]);
               task.push(admin.database().ref(`reviews`).child(classId).child(key).child('profile').set(original.profile))
             });
-             // eslint-disable-next-line no-empty
-             // if (list[key].userId === userid){
-                // task.push(admin.database().ref(`reviews`).child(key).child('profile').set(original.profile))
-             // }
+           
            });
         //  console.log("take is",task)
         }
@@ -679,12 +549,6 @@ exports.trainerBookingList = functions.https.onCall((data, context) => {
        // console.log(snapshot[0].val())
        var list =  snapshot[0].val()
        
-    //    console.log(list)
-    //    console.log("data size " +Object.keys(list).length)
-        
-        // for (const [name, value] of Object.entries(list)) {
-        //   //  console.log(name, value)
-        // }
         
        return {"data" :list}
     }).catch(() => {
@@ -698,41 +562,3 @@ exports.trainerBookingList = functions.https.onCall((data, context) => {
   });
   // [END messageFunctionTrigger]
 
-
-
-//   return Promise.all( [admin.database().ref(`booking`).orderByChild('userId').equalTo(userid).once('value')]).then((snapshot)=>{
-
-//     // console.log(snapshot[0].val())
-//      var list =  snapshot[0].val()
-//      console.log("data size " +Object.keys(list).length)
-
-//      return {"data" :list}
-//  }).catch(() => {
-//      throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
-//   });
-
-// trainerBookingList({"authorId" : "91Uj65Ak0sUaDoT1y8W8r3LbaOC2"})
-// exports.trainerBookingList = functions.https.onCall((data, context) => {
-//   // [START_EXCLUDE]
-//   console.log("dfgfd" + JSON.stringify(data))
-//   const authorId = data.authorId;
-
-//   if (!(typeof authorId === 'string') || authorId.length === 0 ) {
-//     // Throwing an HttpsError so that the client gets the error details.
-//     throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-//         'one arguments "text" containing the message text to add.');
-//   }
-
-//   return Promise.all( [admin.database().ref(`booking`).orderByChild('authorId').equalTo(authorId).once('value')]).then((snapshot)=>{
-
-//      // console.log(snapshot[0].val())
-//       var list =  snapshot[0].val()
-//       // console.log("data size " +Object.keys(list).length)
-
-//       return {"data" :list}
-//   }).catch(() => {
-//       throw new functions.https.HttpsError('invalid-argument', 'failed to add booking');
-//    });
-
-//   });
-  // [END messageFunctionTrigger]
